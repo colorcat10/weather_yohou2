@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>天気予報</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>天気予報検索</h1>
+        <input type="text" id="city" placeholder="都市名を入力">
+        <button onclick="fetchWeather()">検索</button>
+        <table id="weather-table">
+            <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>時間帯</th>
+                    <th>天気</th>
+                    <th>気温</th>
+                    <th>湿度</th>
+                    <th>風速</th>
+                    <th>天気図</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchWeather() {
+            const city = document.getElementById('city').value;
+            const apiKey = 'a90d94a74a5d6ae8ed672f2170276b57';
+            const url = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&lang=ja&units=metric`;
+            const response = await fetch(url);
+            const data = await response.json();
+            displayWeather(data);
+        }
+
+        function displayWeather(data) {
+            const weatherTable = document.getElementById('weather-table').getElementsByTagName('tbody')[0];
+            weatherTable.innerHTML = '';
+            data.list.forEach(item => {
+                const row = weatherTable.insertRow();
+                const dateCell = row.insertCell(0);
+                const timeCell = row.insertCell(1);
+                const weatherCell = row.insertCell(2);
+                const tempCell = row.insertCell(3);
+                const humidityCell = row.insertCell(4);
+                const windCell = row.insertCell(5);
+                const iconCell = row.insertCell(6);
+
+                timeCell.innerHTML = new Date(item.dt * 1000).toLocaleTimeString();
+                dateCell.innerHTML = new Date(item.dt * 1000).toLocaleDateString();
+                weatherCell.innerHTML = item.weather[0].description;
+                tempCell.innerHTML = `${item.main.temp}°C`;
+                humidityCell.innerHTML = `${item.main.humidity}%`;
+                windCell.innerHTML = `${item.wind.speed}m/s`;
+                const iconUrl = `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`;
+                iconCell.innerHTML = `<img class="icon" src="${iconUrl}" alt="${item.weather[0].description}">`;
+            });
+        }
+    </script>
+</body></html>
